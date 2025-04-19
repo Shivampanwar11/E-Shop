@@ -1,0 +1,80 @@
+{%extends 'shop/basic.html'%} 
+{% comment %} 
+ {%block title%} shop-contactus {% endblock %}
+{% block body%} this is our Contact Us page {%endblock%} {% endcomment %}
+
+
+{% block title %}Contact Us{% endblock %}
+
+{% block css %}
+<style>
+.contact-section {
+    padding: 60px 20px;
+    background-color: #f9f9f9;
+}
+.contact-section h1 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    text-align: center;
+}
+.contact-section p {
+    max-width: 700px;
+    margin: 0 auto 30px;
+    text-align: center;
+    font-size: 1.1rem;
+}
+.contact-form {
+    max-width: 600px;
+    margin: auto;
+}
+.contact-info {
+    background-color: #fff;
+    padding: 30px;
+    margin-top: 50px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.contact-info h4 {
+    margin-bottom: 20px;
+}
+.contact-info p {
+    margin: 5px 0;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="contact-section">
+    <h1>Contact Us</h1>
+    <p>Have questions, suggestions, or need help? We'd love to hear from you. Fill out the form below or reach out through any of our contact details.</p>
+    
+    <form method="post" class="contact-form shadow p-4 bg-white rounded">
+       {% csrf_token %} 
+        <div class="mb-3">
+            <label for="name" class="form-label">Full Name</label>
+            <input type="text" class="form-control" name="name" id="name" placeholder="Enter your full name" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email address</label>
+            <input type="email" class="form-control" name="email" id="email" placeholder="Enter your email" required>
+        </div>
+        <div class="mb-3">
+            <label for="phone" class="form-label">Phone Number</label>
+            <input type="text" class="form-control" name="phone" id="phone" placeholder="Enter your phone number">
+        </div>
+        <div class="mb-3">
+            <label for="desc" class="form-label">Your Message</label>
+            <textarea class="form-control" name="desc" id="desc" rows="5" placeholder="Write your message here..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Send Message</button>
+    </form>
+
+    <div class="contact-info mt-5 text-center">
+        <h4>Reach Us Directly</h4>
+        <p><strong>Email:</strong> panwarshivam901@gmail.com</p>
+        <p><strong>Phone:</strong> +91-8766234573</p>
+        <p><strong>Location:</strong> New Delhi, India</p>
+        <p><strong>Hours:</strong> Mon–Fri | 9 AM – 6 PM</p>
+    </div>
+</div>
+{% endblock %}

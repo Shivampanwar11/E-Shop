@@ -1,0 +1,158 @@
+{% extends 'shop/basic.html' %}
+
+{% block title%} Home {%endblock%}
+
+{% block css %}
+.hero-section { 
+    background: #b58c86; 
+    padding: 20px; 
+    text-align: center; 
+}
+
+.category-section { 
+    padding: 10px 0; 
+}
+
+.carousel-container { 
+    width: 100%; 
+    height: 50vh; 
+    overflow: hidden; 
+}
+
+.carousel img { 
+    height: 50vh; 
+    object-fit: cover; 
+}
+.card {
+    width: 500px;  
+    height: 400px;
+    margin: 2px;
+    padding: 4px;
+}
+
+.card img {
+    height: 200px;
+    object-fit: cover;
+}
+
+.product-slider { 
+    display: flex;
+    overflow-x: auto; 
+    scroll-behavior: smooth;
+    white-space: nowrap;
+    padding-bottom: 10px;
+}
+
+.product-slider .product { 
+    flex: 0 0 auto; 
+    width: 250px; 
+    margin-right: 15px; 
+}
+
+.carousel-item {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.col-md-3 img {
+    width: 100%;
+    height: 255px;
+    object-fit: cover;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+    width: 50px;
+    height: 50px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 90%;
+    transform: translateY(-80%);
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    filter: brightness(2);
+}
+
+.carousel-control-prev {
+    left: 10px;
+}
+
+.carousel-control-next {
+    right: 10px;
+}
+
+.carousel-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.carousel-item {
+    transition: transform 0.4s ease-in-out !important;
+}
+{% endblock %}
+
+{%block body %}
+{% load static %}
+<div class="carousel-container">
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="1000">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{% static 'shop/lap.png.jpg' %}" class="d-block w-100" alt="Offer 1">
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'shop/phone.jpg' %}" class="d-block w-100" alt="Offer 2">
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'shop/Watch.jpg' %}" class="d-block w-100" alt="Offer 3">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+    </div>
+</div>
+
+<div class="container category-section">
+    {%for product,range,nSlides in allProd%}
+    <h3 class='my-4 mx-5'>{{product.0.category}}</h3>
+    <div class='row'>
+        <div class="product-slider">
+            {% for i in product %}
+            <div class="product card">
+                <img src='/media/{{i.image}}' class="img-fluid" alt="{{ i.name }}">
+                <div class="card-body">
+                    <h5 class="card-title" id="namepr{{i.id}}">{{i.product_name}}</h5>
+                    <p class="card-text">{{ i.des|truncatewords:4 }}</p>
+                    <p class="price" id="pricepr{{i.id}}" data-product-id="{{ i.id }}"><strong>Price: ₹{{ i.price}}</strong></p>
+                    <span id="divpr{{i.id}}">
+                        <button id='pr{{i.id}}' class="btn btn-primary add-to-cart cart" data-product-id="{{ i.id }}">Add to Cart</button> 
+                    </span>
+                    <a href='/shop/products/{{i.id}}'>
+                        <button id='qv{{i.id}}' class="btn btn-primary add-to-cart cart mx-5" data-product-id="{{ i.id }}"> View </button>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+

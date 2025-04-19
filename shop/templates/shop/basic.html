@@ -1,0 +1,237 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{%block title%} {%endblock%}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    
+    <style>
+        .navbar { background-color: #232f3e; }
+        .navbar a, .navbar .nav-link { color: white; }
+        {%block css%} {%endblock%}
+        
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand text-white" href="/shop">E-Shop</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="/shop/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/shop/tracker">Tracker  </a></li>
+                    <li class="nav-item"><a class="nav-link" href="/shop/about">About Us</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/shop/contact">Contact Us</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarCartDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          Cart (<span id="cart">0</span>)
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end p-3" aria-labelledby="navbarCartDropdown" style="min-width: 250px;" id="cartDropdown">
+                          <li><h6 class="dropdown-header">Your cart is empty</h6></li>
+                        </ul>
+                      </li>
+                      
+                </ul>
+                <form class="d-flex">
+                    <input class="form-control me-2" type="search" placeholder="Search">
+                    <button class="btn btn-warning" type="submit">Search</button>
+                </form>
+               
+
+                
+                
+                {% comment %} <a class="btn btn-outline-light ms-3" href="#">Cart(<span id='cart'>0</span> )</a> {% endcomment %}
+            </div>
+        </div>
+    </nav>
+    
+   
+
+    {% block body%}
+    {%endblock%}
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> 
+     <script>
+        if (localStorage.getItem('cart') == null) {
+            var cart = {};
+        } else {
+            cart = JSON.parse(localStorage.getItem('cart'));
+            updateCart(cart);
+        }
+    
+        // Handle add-to-cart button click
+     $(document).on('click', '.cart', function () {
+
+            var idstr = this.id.toString();
+            if (cart[idstr] != undefined) {
+                qty=cart[idstr][0]+1;
+               
+                cart[idstr] = [qty,name,price];
+            } else {
+                  qty=1;
+                name=document.getElementById('name'+idstr).innerHTML;
+                price=document.getElementById('price'+idstr).innerHTML;
+
+                cart[idstr] = [qty,name,parseInt(price)];
+            }
+            updateCart(cart);
+        }); 
+       
+        
+        // Handle + and - button events
+        $(document).on('click', 'button.minus', function () {
+            var id = this.id.slice(5);
+            if (cart[id][0] > 1) {
+                cart[id][0] -= 1;
+            } else {
+                delete cart[id];
+                document.getElementById('div' + id).innerHTML = `
+                    <button id="${id}" class="btn btn-primary add-to-cart cart">Add to Cart</button>
+                `;
+            }
+            updateCart(cart);
+        });
+    
+        $(document).on('click', 'button.plus', function () {
+            var id = this.id.slice(4);
+            cart[id][0] += 1;
+            updateCart(cart);
+        });
+    
+        function updateCart(cart) {
+            let sum = 0;
+            let totalPrice=0;
+            for (var item in cart) {
+                sum += cart[item][0];
+                if (document.getElementById('div' + item)) {
+                    document.getElementById('div' + item).innerHTML =
+                        `<button id='minus${item}' class='btn btn-primary minus'>-</button> 
+                        <span id='val${item}'>${cart[item][0]}</span> 
+                        <button id='plus${item}' class='btn btn-primary plus'>+</button>`;
+                }
+            }
+        
+            localStorage.setItem('cart', JSON.stringify(cart));
+            document.getElementById('cart').innerText = sum;
+        
+            updateCartDropdown(cart);
+        }
+        
+        function updateCartDropdown(cart) {
+            let dropdown = document.getElementById('cartDropdown');
+            dropdown.innerHTML = '';
+        
+            if (Object.keys(cart).length === 0) {
+                dropdown.innerHTML = '<li><h6 class="dropdown-header">Your cart is empty</h6></li>';
+                return;
+            }
+        
+            let html = '<li><h6 class="dropdown-header">Cart Items:</h6></li>';
+            for (let id in cart) {
+                let name = document.getElementById('name' + id)?.innerText || 'Unnamed';
+                html += `
+                <li class="dropdown-item d-flex justify-content-between align-items-center">
+                    ${name}
+                    <span class="badge bg-primary rounded-pill">${cart[id][0]}</span>
+                </li>`;
+            }
+        
+            html += `
+            <li><hr class="dropdown-divider"></li>
+            <li><button id="clearCartBtn" class="dropdown-item text-danger">Clear Cart</button></li>
+            <li><a href="/shop/checkout" class="dropdown-item text-success">Checkout</a></li>`;
+        
+            dropdown.innerHTML = html;
+        
+            const btn = document.getElementById('clearCartBtn');
+            if (btn) {
+                btn.addEventListener('click', clearCart);
+            }
+        }
+        
+        function clearCart() {
+            // Clear all product divs
+            for (let item in cart) {
+                const div = document.getElementById('div' + item);
+                if (div) {
+                    div.innerHTML = `<button id="${item}" class="btn btn-primary cart">Add to Cart</button>`;
+                }
+            }
+        
+            // Reset cart
+            cart = {};
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCart(cart);
+        
+            // Re-bind the .cart click events
+            $('.cart').off('click').on('click', function () {
+                let idstr = this.id.toString();
+                if (cart[idstr] !== undefined) {
+                    cart[idstr][0] += 1;
+                } else {
+                    cart[idstr][0] = 1;
+                }
+                updateCart(cart);
+            });
+        }
+        
+       function updatePopover(cart) {
+        let popStr = "<h5>Cart Items:</h5><ul class='list-group mb-2'>";
+        for (var item in cart) {
+            let name = document.getElementById('name' + item)?.innerText || 'Unnamed';
+            popStr += `
+                <li class='list-group-item d-flex justify-content-between align-items-center'>
+                    ${name}
+                    <span class='badge bg-primary rounded-pill'>${cart[item][0]}</span>
+                </li>`;
+        }
+        popStr += "</ul>";
+    
+        // Add buttons if cart has items
+        if (Object.keys(cart).length > 0) {
+            popStr += `
+                <div class='d-grid gap-2'>
+                    <button id="clearCartBtn" class='btn btn-danger btn-sm'>Clear Cart</button>
+                    <a href='/shop/checkout/' class='btn btn-success btn-sm'>Checkout</a>
+                </div>`;
+        } else {
+            popStr = "<h5>Your cart is empty!</h5>";
+        }
+    
+        const popcart = document.getElementById('popcart');
+        if (popcart) {
+            popcart.setAttribute('data-bs-toggle', 'popover');
+            popcart.setAttribute('title', 'Your Cart');
+            popcart.setAttribute('data-bs-html', 'true');
+            popcart.setAttribute('data-bs-content', popStr);
+    
+            // Destroy and re-init popover
+            let existing = bootstrap.Popover.getInstance(popcart);
+            if (existing) existing.dispose();
+            new bootstrap.Popover(popcart);
+    
+           
+    
+            // Add event listener for clear cart
+            setTimeout(() => {
+                const btn = document.getElementById('clearCartBtn');
+                if (btn) {
+                    btn.addEventListener('click', clearCart);
+                }
+            }, 300); // timeout to wait for popover DOM insertion
+        }
+    }
+    
+        
+        
+    </script> 
+    {% block js %}{% endblock %}
+    
+</body>
+</html>

@@ -1,0 +1,125 @@
+{%extends 'shop/basic.html'%}
+{%block title%} shop-checkout {% endblock %}
+{% block body%}
+<div class="container my-3">
+<h4>Step 1 : Verify Your Cart Items </h4>
+ <ol class="list-group list-group-numbered alig-items-center" id="items">
+ </ol>
+ 
+</div>
+<div class= "container my-5" >
+    <h4> Step 2 : Enter Your Details  </h4>
+<form class="row g-3" method="post" action="/shop/checkout">{% csrf_token %}
+  <input type='hidden' name='itemsJson' id='itemsJson'>
+    <div class="col-md-6">
+        <label for="inputname" class="form-label">Name</label>
+        <input type="text" class="form-control" id="name"  name="name">
+      </div>
+    <div class="col-md-6">
+      <label for="inputEmail4" class="form-label">Email</label>
+      <input type="email" class="form-control" id="email" name="email">
+    </div>
+    
+    <div class="col-12">
+      <label for="inputAddress" class="form-label">Address</label>
+      <input type="text" class="form-control" id="address1"  name="address1" placeholder="1234 Main St">
+    </div>
+    <div class="col-12">
+      <label for="inputAddress2" class="form-label">Address 2</label>
+      <input type="text" class="form-control" id="address2"  name="address2" placeholder="Apartment, studio, or floor">
+    </div>
+    <div class="col-md-6">
+      <label for="inputCity" class="form-label">City</label>
+      <input type="text" class="form-control" id="city"  name="city">
+    </div>
+    <div class="col-md-4">
+        <label for="inputState" class="form-label">State</label>
+        <select id="state" class="form-select" name="state">
+          <option selected disabled>Choose...</option>
+          <option value="Andhra Pradesh">Andhra Pradesh</option>
+          <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+          <option value="Assam">Assam</option>
+          <option value="Bihar">Bihar</option>
+          <option value="Chhattisgarh">Chhattisgarh</option>
+          <option value="Goa">Goa</option>
+          <option value="Gujarat">Gujarat</option>
+          <option value="Haryana">Haryana</option>
+          <option value="Himachal Pradesh">Himachal Pradesh</option>
+          <option value="Jharkhand">Jharkhand</option>
+          <option value="Karnataka">Karnataka</option>
+          <option value="Kerala">Kerala</option>
+          <option value="Madhya Pradesh">Madhya Pradesh</option>
+          <option value="Maharashtra">Maharashtra</option>
+          <option value="Manipur">Manipur</option>
+          <option value="Meghalaya">Meghalaya</option>
+          <option value="Mizoram">Mizoram</option>
+          <option value="Nagaland">Nagaland</option>
+          <option value="Odisha">Odisha</option>
+          <option value="Punjab">Punjab</option>
+          <option value="Rajasthan">Rajasthan</option>
+          <option value="Sikkim">Sikkim</option>
+          <option value="Tamil Nadu">Tamil Nadu</option>
+          <option value="Telangana">Telangana</option>
+          <option value="Tripura">Tripura</option>
+          <option value="Uttar Pradesh">Uttar Pradesh</option>
+          <option value="Uttarakhand">Uttarakhand</option>
+          <option value="West Bengal">West Bengal</option>
+          <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+          <option value="Chandigarh">Chandigarh</option>
+          <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+          <option value="Delhi">Delhi</option>
+          <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+          <option value="Ladakh">Ladakh</option>
+          <option value="Lakshadweep">Lakshadweep</option>
+          <option value="Puducherry">Puducherry</option>
+        </select>
+      </div>
+      
+    <div class="col-md-2">
+      <label for="inputZip" class="form-label">Zip</label>
+      <input type="text" class="form-control" id="zip_code"  name="zip_code">
+    </div>
+    <div class="col-md-2">
+        <label for="inputphone" class="form-label">Phone </label>
+        <input type="tel" class="form-control" id="phone"  name="phone">
+      </div>
+    <div class="col-12">
+      <button type="submit" class="btn btn-primary">Place Order </button>
+    </div>
+  </form>
+</div>
+ {%endblock%}
+ {% block js %}
+ <script>
+    if (localStorage.getItem('cart') == null) {
+        var cart = {};
+    } else {
+        cart = JSON.parse(localStorage.getItem('cart'));
+       
+    }
+    if($.isEmptyObject(cart)){
+      mystr=`Cart looks empty please add items `
+      $('#items').append(mystr);
+    }
+    else{
+     for(item in cart){
+        let name=cart[item][1];
+        let qty=cart[item][0];
+        let itemPrice=cart[2];
+
+        mystr=` <li class="list-group-item d-flex justify-content-between align-items-start">
+        ${name}
+        <span class="badge text-bg-primary rounded-pill">${qty}</span>
+        </li>`
+        $('#items').append(mystr);}
+      document.getElementById('totalPrice').innerHTML=totalPrice;  
+    }
+    $('#itemsJson').val(JSON.stringify(cart));
+    {% if thank%}
+    alert('Thanks you for ordering with us! , Your orderid is {{id}}. You can use it to track your order ');
+    localStorage.clear();
+    document.location = '/shop';
+    {% endif %}
+</script>
+
+ {%endblock%} 

@@ -1,0 +1,91 @@
+{% extends 'shop/basic.html' %}
+{% block title %} shop-tracker {% endblock %}
+{% block body %}
+<div class="container my-3">
+  <h4>Enter your order id and email address:</h4>
+  
+  <form class="row g-3" method="post" action="#" id="trackerForm">{% csrf_token %}
+    <div class="col-md-6">
+      <label for="orderId" class="form-label">Order ID</label>
+      <input type="text" class="form-control" id="orderId" name="orderId" required>
+    </div>
+    <div class="col-md-6">
+      <label for="email" class="form-label">Email</label>
+      <input type="email" class="form-control" id="email" name="email" required>
+    </div>
+    <div class="col-12">
+      <button type="submit" class="btn btn-primary">Track Order</button>
+    </div>
+  </form>
+
+  <div class="col my-4">
+    <h4>Your Order Status</h4>
+    <ul class="list-group" id="orderStatusList">
+      Please enter your order id and email address to track your order!
+    </ul>
+  </div>
+  <div class="col my-4">
+    <h4>Your Order Details</h4>
+    <ul class="list-group" id="citems">
+     
+    </ul>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+  $(document).ready(function () {
+    $('#trackerForm').submit(function (event) {
+      event.preventDefault(); // Prevent default form submission
+
+      $("#orderStatusList").empty(); // Clear previous results
+
+      var formData = {
+        orderId: $('#orderId').val(),
+        email: $('#email').val(),
+        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+      };
+
+      $.ajax({
+        type: "POST",
+        url: "/shop/tracker",
+        data: formData,
+        encode: true
+      }).done(function (data) {
+        try {
+          data=JSON.parse(data);
+          let updates = data[0]; 
+          if (Array.isArray(updates) && updates.length > 0) {
+            for (let i = 0; i < updates.length; i++) {
+              let text = updates[i]['text'];
+              let time = updates[i]['time'];
+              let listItem = `
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                  ${text}
+                  <span class="badge text-bg-primary rounded-pill">${time}</span>
+                </li>`;
+              $('#orderStatusList').append(listItem);
+            }
+          } else {
+            $('#orderStatusList').append(`<li class="list-group-item">Sorry, no updates found.</li>`);
+          }
+          cart= JSON.parse(data[1]);
+          console.log(cart)
+          for(item in cart){
+            let name=cart[item][1];
+            let qty=cart[item][0];
+            mystr=` <li class="list-group-item d-flex justify-content-between align-items-start">
+            ${name}
+            <span class="badge text-bg-primary rounded-pill">${qty}</span>
+            </li>`
+            $('#citems').append(mystr);}
+        } catch (err) {
+          console.error("Error parsing response: ", err);
+          $('#orderStatusList').append(`<li class="list-group-item">An error occurred. Please try again later.</li>`);
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}
